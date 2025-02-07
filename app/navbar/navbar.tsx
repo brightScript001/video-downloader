@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import {
   SunIcon,
   MoonIcon,
@@ -10,6 +11,7 @@ import {
 const Navbar: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     const storedTheme = localStorage.getItem("theme");
@@ -37,23 +39,37 @@ const Navbar: React.FC = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
+  const navLinks = [
+    { name: "YouTube Video Downloader", path: "/" },
+    { name: "About", path: "/about" },
+  ];
+
   return (
-    <header className="bg-white dark:bg-gray-800 shadow-md">
+    <header className="bg-[#FFFFFF] dark:bg-[#212121] shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           <div className="flex-shrink-0">
-            <span className="text-xl font-bold text-gray-900 dark:text-white">
-              TubeGrab
+            <span className="text-xl font-bold text-[#6C5CE7]">
+              Tube
+              <span className="text-[#000000] dark:text-[#FFFFFF]">Grab</span>
             </span>
           </div>
 
           <nav className="hidden sm:flex absolute left-1/2 transform -translate-x-1/2 space-x-6">
-            <a href="#" className="text-gray-900 dark:text-white">
-              Home
-            </a>
-            <a href="#" className="text-gray-900 dark:text-white">
-              About
-            </a>
+            {navLinks.map((link) => (
+              <a
+                key={link.path}
+                href={link.path}
+                className={`relative text-gray-900 dark:text-white ${
+                  pathname === link.path ? "font-semibold" : ""
+                }`}
+              >
+                {link.name}
+                {pathname === link.path && (
+                  <span className="absolute left-0 bottom-[-4px] w-full h-[2px] bg-[#6C5CE7] dark:bg-[#A29BFE]"></span>
+                )}
+              </a>
+            ))}
           </nav>
 
           <div className="flex items-center space-x-4">
@@ -67,7 +83,6 @@ const Navbar: React.FC = () => {
                 <MoonIcon className="h-5 w-5 text-gray-900" />
               )}
             </button>
-
             <button onClick={toggleMenu} className="sm:hidden p-2">
               {isMenuOpen ? (
                 <XMarkIcon className="h-6 w-6 text-gray-900 dark:text-white" />
@@ -81,12 +96,17 @@ const Navbar: React.FC = () => {
 
       {isMenuOpen && (
         <nav className="sm:hidden bg-white dark:bg-gray-800 p-4">
-          <a href="#" className="block py-2 text-gray-900 dark:text-white">
-            Home
-          </a>
-          <a href="#" className="block py-2 text-gray-900 dark:text-white">
-            About
-          </a>
+          {navLinks.map((link) => (
+            <a
+              key={link.path}
+              href={link.path}
+              className={`block py-2 text-gray-900 dark:text-white ${
+                pathname === link.path ? "font-semibold underline" : ""
+              }`}
+            >
+              {link.name}
+            </a>
+          ))}
         </nav>
       )}
     </header>
