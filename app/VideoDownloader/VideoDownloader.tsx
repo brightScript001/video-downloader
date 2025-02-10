@@ -14,31 +14,39 @@ const VideoDownloader: React.FC = () => {
 
     setIsLoading(true);
     try {
+      console.log("Fetching video from API...");
+
       const response = await fetch(
-        `https://api.apify.com/v2/acts/wilcode~all-social-media-video-downloader/run-sync-get-dataset-items?token=YOUR_API_TOKEN`,
+        "https://all-social-media-video-downloader.p.rapidapi.com/",
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            url: videoUrl,
-            proxySettings: {
-              useApifyProxy: true,
-              apifyProxyGroups: ["RESIDENTIAL"],
-            },
-          }),
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "x-rapidapi-host":
+              "all-social-media-video-downloader.p.rapidapi.com",
+            "x-rapidapi-key": process.env.NEXT_PUBLIC_RAPIDAPI_KEY || "",
+          },
+          body: new URLSearchParams({ url: videoUrl }),
         }
       );
 
-      if (!response.ok) throw new Error("Failed to fetch video");
+      console.log("Response Status:", response.status, response.statusText);
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch video: ${response.statusText}`);
+      }
+
       const data = await response.json();
-      const downloadUrl = data[0]?.videoUrl;
+      console.log("API Response:", data);
+
+      const downloadUrl = data.video || data.url || data.link || null;
       if (downloadUrl) {
         window.location.href = downloadUrl;
       } else {
         alert("Download URL not found.");
       }
     } catch (error) {
-      console.error(error);
+      console.error("Error fetching video:", error);
       alert("Error downloading video. Please try again.");
     } finally {
       setIsLoading(false);
@@ -47,7 +55,7 @@ const VideoDownloader: React.FC = () => {
 
   return (
     <div className="p-4 max-w-xl mx-auto">
-      <div className="grid grid-cols-[auto_1fr_auto] gap-0 w-full items-center">
+      <div className="grid grid-cols-[auto_1fr_auto] gap-3 w-full items-center">
         {/* Video Quality Dropdown */}
         <select
           className="p-2 border text-[16px] rounded-md dark:bg-[#000] dark:text-white dark:border-gray-700"
